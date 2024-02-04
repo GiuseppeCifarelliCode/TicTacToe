@@ -1,3 +1,8 @@
+let gameBoard = [
+    ['', '', ''],
+    ['', '', ''],
+    ['', '', '']
+];
 
 function createGame(){
     let c = 0
@@ -5,9 +10,9 @@ function createGame(){
         let row = document.createElement("div")
         row.setAttribute("class","row justify-content-around m-4")
         row.innerHTML =`
-        <div id=`+(c++)+` onclick="selectBox()" class="col text-bg-info mx-2" style="width:250px;height:250px"></div>
-        <div id=`+(c++)+` onclick="selectBox()" class="col text-bg-info mx-2" style="width:250px;height:250px"></div>
-        <div id=`+(c++)+` onclick="selectBox()" class="col text-bg-info mx-2" style="width:250px;height:250px"></div>`
+        <div id=`+(c++)+` onclick="selectBox(this.id)" class="col text-bg-info mx-2 box" style="width:250px;height:250px"></div>
+        <div id=`+(c++)+` onclick="selectBox(this.id)" class="col text-bg-info mx-2 box" style="width:250px;height:250px"></div>
+        <div id=`+(c++)+` onclick="selectBox(this.id)" class="col text-bg-info mx-2 box" style="width:250px;height:250px"></div>`
         document.getElementById("game").appendChild(row) 
     }
 
@@ -44,8 +49,66 @@ function createPlayersGrid(){
     document.getElementById("round").innerText = player1 + "'s round"
 }
 
-function selectBox(){
-    console.log(document.getElementById('3'));
+function selectBox(boxId){
+    let clickedBox = document.getElementById(boxId)
+
+    //Coordinate row e col
+    const row = Math.floor(boxId / 3);
+    const col = boxId % 3;
+
+    let playerRound = document.getElementById("round")
+    const player1 = sessionStorage.getItem('player1')
+    const player2 = sessionStorage.getItem('player2')
+
+    if (gameBoard[row][col] === '') {
+
+        if (playerRound.innerText === player1 + "'s round")  {
+            gameBoard[row][col] = 'X';
+            clickedBox.style.backgroundImage = 'url(assets/x.png)'
+            clickedBox.style.backgroundSize = "contain";
+            clickedBox.style.backgroundPosition = "center";
+            clickedBox.style.backgroundRepeat = "no-repeat";
+            document.getElementById("round").innerText = player2 + "'s round"  
+        } else {
+            gameBoard[row][col] = 'O';
+            clickedBox.style.backgroundImage = 'url(assets/circle.jpg)'  
+            clickedBox.style.backgroundSize = "contain";
+            clickedBox.style.backgroundPosition = "center";
+            clickedBox.style.backgroundRepeat = "no-repeat";
+            document.getElementById("round").innerText = player1 + "'s round"
+        }
+
+        // Controlla se c'è una vittoria
+        if (checkForWin()) {
+            alert('Hai vinto!');
+            // Puoi fare altre azioni qui, come ricominciare il gioco
+        }
+
+        // Aggiungi la tua logica aggiuntiva per il gioco
+    }
+    checkForWin()
+}
+
+function checkForWin() {
+    // Controlla righe e colonne
+    for (let i = 0; i < 3; i++) {
+        if (gameBoard[i][0] === gameBoard[i][1] && gameBoard[i][1] === gameBoard[i][2] && gameBoard[i][0] !== '') {
+            return true; // Vittoria in una riga
+        }
+        if (gameBoard[0][i] === gameBoard[1][i] && gameBoard[1][i] === gameBoard[2][i] && gameBoard[0][i] !== '') {
+            return true; // Vittoria in una colonna
+        }
+    }
+
+    // Controlla diagonali
+    if (gameBoard[0][0] === gameBoard[1][1] && gameBoard[1][1] === gameBoard[2][2] && gameBoard[0][0] !== '') {
+        return true; // Vittoria sulla diagonale principale
+    }
+    if (gameBoard[0][2] === gameBoard[1][1] && gameBoard[1][1] === gameBoard[2][0] && gameBoard[0][2] !== '') {
+        return true; // Vittoria sulla diagonale secondaria
+    }
+
+    return false; // Nessuna vittoria
 }
 
 createGame()
